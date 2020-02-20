@@ -4,8 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { StatisticsModule } from './statistics/statistics.module';
 import configuration from './config/app.config';
+import { StatisticsModule } from './statistics/statistics.module';
+import { SharedModule } from './shared/shared.module';
 
 const AppConfigModule = ConfigModule.forRoot({
   load: [configuration],
@@ -24,7 +25,8 @@ const AppConfigModule = ConfigModule.forRoot({
       inject: [ConfigService],
     }),
     StatisticsModule,
-
+    AppConfigModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
