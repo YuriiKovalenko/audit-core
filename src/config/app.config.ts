@@ -1,5 +1,6 @@
-export default () => ({
+export const appConfig = () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
+  secret: process.env.SECRET || 'secret',
   database: {
     type: process.env.DATABASE_TYPE || 'postgres',
     url:

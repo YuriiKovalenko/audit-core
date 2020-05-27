@@ -17,11 +17,7 @@ export class Statistics {
 
   @Expose()
   @Column()
-  public checked: number;
-
-  @Expose()
-  @Column()
-  public covered: number;
+  public filled: number;
 
   @Expose()
   @Column()
@@ -29,24 +25,24 @@ export class Statistics {
 
   @Expose()
   @Column()
-  public dried: number;
+  public ready: number;
 
   @Expose()
-  @Column()
-  public type: string;
+  @Column({ nullable: true })
+  public working: boolean;
 
   @Expose()
   public get startFailed() {
-    return this.start - this.checked;
+    return this.start - this.filled;
   }
 
   @Expose()
   public get midFailed() {
-    return this.covered - this.inspected;
+    return this.filled - this.inspected;
   }
 
   @Expose()
   public get endFailed() {
-    return this.inspected - this.dried;
+    return this.inspected - this.ready;
   }
 }
