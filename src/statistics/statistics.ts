@@ -12,37 +12,10 @@ export class Statistics {
   public createdAt: Date;
 
   @Expose()
-  @Column()
-  public start: number;
+  @Column('int', { array: true })
+  public data: number[];
 
   @Expose()
   @Column()
-  public filled: number;
-
-  @Expose()
-  @Column()
-  public inspected: number;
-
-  @Expose()
-  @Column()
-  public ready: number;
-
-  @Expose()
-  @Column({ nullable: true })
   public working: boolean;
-
-  @Expose()
-  public get startFailed() {
-    return this.start - this.filled;
-  }
-
-  @Expose()
-  public get midFailed() {
-    return this.filled - this.inspected;
-  }
-
-  @Expose()
-  public get endFailed() {
-    return this.inspected - this.ready;
-  }
 }

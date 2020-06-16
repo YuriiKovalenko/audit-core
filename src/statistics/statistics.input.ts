@@ -1,8 +1,5 @@
 export class StatisticsInput {
-  start: number;
-  filled: number;
-  inspected: number;
-  ready: number;
+  data: number[];
   date: Date | string;
   working: boolean;
 }

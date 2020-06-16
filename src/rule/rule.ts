@@ -7,18 +7,18 @@ export class Rule {
   id: number;
 
   @Expose()
-  @Column()
+  @Column({ unique: true })
   propertyName: string;
 
   @Expose()
-  @Column()
+  @Column({ default: 0 })
   ok: number;
 
   @Expose()
-  @Column()
+  @Column({ default: 0 })
   normal: number;
 
   @Expose()
-  @Column()
+  @Column({ default: 0 })
   danger: number;
 }

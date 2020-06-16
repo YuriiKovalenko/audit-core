@@ -30,10 +30,7 @@ export class StatisticsService {
 
   public mapInput(statisticsInput: StatisticsInput) {
     return this.statisticsRepository.create({
-      start: statisticsInput.start,
-      filled: statisticsInput.filled,
-      inspected: statisticsInput.inspected,
-      ready: statisticsInput.ready,
+      data: statisticsInput.data,
       createdAt: statisticsInput.date,
       working: statisticsInput.working,
     });
