@@ -21,4 +21,8 @@ export class Rule {
   @Expose()
   @Column({ default: 0 })
   danger: number;
+
+  @Expose()
+  @Column()
+  description: string;
 }

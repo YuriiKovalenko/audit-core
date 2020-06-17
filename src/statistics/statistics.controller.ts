@@ -27,6 +27,14 @@ export class StatisticsController {
     return this.statisticsService.getStatisticsByTimeframe(startDate, endDate);
   }
 
+  @Get('hourly')
+  public getStatisticsHourly(
+    @Query('startDate', ParseDatePipe) startDate: Date,
+    @Query('endDate', ParseDatePipe) endDate: Date,
+  ) {
+    return this.statisticsService.getStatisticsHourly(startDate, endDate);
+  }
+
   @Post()
   public createStatistics(@Body() statisticsInput: StatisticsInput) {
     console.log(statisticsInput);
