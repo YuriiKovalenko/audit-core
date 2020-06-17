@@ -50,7 +50,16 @@ export class StatisticsService {
 
   public async createStatistics(statisticsInput: StatisticsInput) {
     const statistics = this.mapInput(statisticsInput);
-    await this.statisticsRepository.save(statistics);
+    const latest = await this.statisticsRepository.findOne({
+      order: { createdAt: 'DESC' },
+    });
+    if (latest) {
+      return this.statisticsRepository.save({
+        ...statistics,
+        data: statistics.data.map((e, i) => e - latest.data[i]),
+      });
+    }
+    return this.statisticsRepository.save(statistics);
   }
 
   public mapInput(statisticsInput: StatisticsInput) {
