@@ -4,7 +4,7 @@ import { Expose, Exclude } from 'class-transformer';
 @Entity()
 export class Statistics {
   @Exclude()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({unsigned: true})
   public id: number;
 
   @Expose()
