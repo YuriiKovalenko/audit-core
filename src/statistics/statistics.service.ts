@@ -45,6 +45,12 @@ export class StatisticsService {
   }
 
   public async createStatistics(statisticsInput: StatisticsInput) {
+    if (
+      !statisticsInput.data.length ||
+      statisticsInput.data.every(e => e === 0)
+    ) {
+      return;
+    }
     const statistics = this.mapInput(statisticsInput);
     const existing = await this.statisticsRepository.find({
       order: { createdAt: 'DESC' },
