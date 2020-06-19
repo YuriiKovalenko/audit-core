@@ -66,25 +66,33 @@ export class StatisticsService {
   }
 
   public async getStatus(startDate: Date, endDate: Date) {
-    const statistics = await this.getStatisticsByTimeframe(
-      startDate,
-      endDate,
-    );
+    const statistics = await this.getStatisticsByTimeframe(startDate, endDate);
     return {
       summed: this.getSummedStatistics(statistics),
     };
   }
 
   private getSummedStatistics(statistics: Statistics[]) {
-    return statistics.reduce((acc, val) => ({
-      start: acc.start + val.start,
-      covered: acc.covered + val.covered,
-      checked: acc.checked + val.checked,
-      ready: acc.ready + val.ready,
-      id: val.id,
-      createdAt: acc.createdAt,
-      working: acc.working || val.working,
-    }));
+    return statistics.reduce(
+      (acc, val) => ({
+        start: acc.start + val.start,
+        covered: acc.covered + val.covered,
+        checked: acc.checked + val.checked,
+        ready: acc.ready + val.ready,
+        id: val.id,
+        createdAt: acc.createdAt,
+        working: acc.working || val.working,
+      }),
+      {
+        checked: 0,
+        start: 0,
+        covered: 0,
+        id: 0,
+        ready: 0,
+        createdAt: new Date(),
+        working: false,
+      },
+    );
   }
 
   private mapInput(statisticsInput: StatisticsInput) {

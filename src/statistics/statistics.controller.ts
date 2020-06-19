@@ -42,6 +42,16 @@ export class StatisticsController {
     return this.statisticsService.getStatus(startDate, endDate);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('summary')
+  public async getSum(
+    @Query('startDate', ParseDatePipe) startDate: Date,
+    @Query('endDate', ParseDatePipe) endDate: Date,
+  ) {
+    const status = await this.statisticsService.getStatus(startDate, endDate);
+    return status.summed;
+  }
+
   @Post()
   public createStatistics(@Body() statisticsInput: StatisticsInput) {
     console.log(statisticsInput);
