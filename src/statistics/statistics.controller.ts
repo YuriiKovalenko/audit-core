@@ -54,7 +54,7 @@ export class StatisticsController {
 
   @Post()
   public createStatistics(@Body() statisticsInput: StatisticsInput) {
-    console.log(statisticsInput);
+    console.log(JSON.stringify(statisticsInput));
     return this.statisticsService.createStatistics(statisticsInput);
   }
 }
