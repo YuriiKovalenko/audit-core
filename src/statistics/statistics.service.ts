@@ -95,7 +95,7 @@ export class StatisticsService {
         covered: 0,
         id: 0,
         ready: 0,
-        createdAt: new Date(),
+        createdAt: statistics[0].createdAt,
         working: false,
       },
     );
