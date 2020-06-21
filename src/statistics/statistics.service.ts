@@ -17,16 +17,16 @@ export class StatisticsService {
     private readonly mapper: StatisticsMapper,
   ) {}
 
-  public getStatisticsByTimeframe(
+  public async getStatisticsByTimeframe(
     startDate: Date = new Date(),
     endDate: Date = new Date(),
   ) {
-    return this.statisticsRepository
+    const stats = await this.statisticsRepository
       .find({
         where: { createdAt: Between(startDate, endDate) },
-        order: { createdAt: 'DESC' },
-      })
-      .then(stats => stats.map(stat => this.mapper.map(stat)));
+        order: { createdAt: 'ASC' },
+      });
+    return stats.map(stat => this.mapper.map(stat));
   }
 
   public async getStatisticsHourly(
@@ -53,7 +53,7 @@ export class StatisticsService {
     }
     const statistics = this.mapInput(statisticsInput);
     const existing = await this.statisticsRepository.find({
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'ASC' },
     });
 
     if (existing.length) {
@@ -95,7 +95,7 @@ export class StatisticsService {
         covered: 0,
         id: 0,
         ready: 0,
-        createdAt: statistics[0].createdAt,
+        createdAt: statistics[0]?.createdAt || new Date(),
         working: false,
       },
     );
