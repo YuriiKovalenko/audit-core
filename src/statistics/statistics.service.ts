@@ -56,7 +56,7 @@ export class StatisticsService {
     const statistics = this.mapInput(statisticsInput);
     const latest = await this.rawLatestRepository.findOne();
 
-    await this.rawLatestRepository.update({}, statistics);
+    await this.rawLatestRepository.save({ ...statistics, id: 1 });
     if (!latest) {
       const existing = await this.statisticsRepository.find({
         order: { createdAt: 'ASC' },
