@@ -8,12 +8,15 @@ import { StatisticsInput } from './statistics.input';
 import { dateTruncate, groupBy } from '../utils';
 import { StatisticsMapper } from './statistics.mapper';
 import { Statistics } from './statistics';
+import { RawLatest } from './raw-latest';
 
 @Injectable()
 export class StatisticsService {
   constructor(
     @InjectRepository(RawStatistics)
     private readonly statisticsRepository: Repository<RawStatistics>,
+    @InjectRepository(RawLatest)
+    private readonly rawLatestRepository: Repository<RawLatest>,
     private readonly mapper: StatisticsMapper,
   ) {}
 
@@ -21,11 +24,10 @@ export class StatisticsService {
     startDate: Date = new Date(),
     endDate: Date = new Date(),
   ) {
-    const stats = await this.statisticsRepository
-      .find({
-        where: { createdAt: Between(startDate, endDate) },
-        order: { createdAt: 'ASC' },
-      });
+    const stats = await this.statisticsRepository.find({
+      where: { createdAt: Between(startDate, endDate) },
+      order: { createdAt: 'ASC' },
+    });
     return stats.map(stat => this.mapper.map(stat));
   }
 
@@ -52,11 +54,18 @@ export class StatisticsService {
       return;
     }
     const statistics = this.mapInput(statisticsInput);
-    const existing = await this.statisticsRepository.find({
-      order: { createdAt: 'ASC' },
-    });
+    const latest = await this.rawLatestRepository.findOne();
 
-    if (existing.length) {
+    await this.rawLatestRepository.update({}, statistics);
+    if (!latest) {
+      const existing = await this.statisticsRepository.find({
+        order: { createdAt: 'ASC' },
+      });
+
+      if (!existing.length) {
+        return this.statisticsRepository.save(statistics);
+      }
+
       const latest = existing.reduce((acc, val) => {
         return {
           ...acc,
@@ -68,7 +77,10 @@ export class StatisticsService {
         data: statistics.data.map((e, i) => e - latest.data[i]),
       });
     }
-    return this.statisticsRepository.save(statistics);
+    return this.statisticsRepository.save({
+      ...statistics,
+      data: statistics.data.map((e, i) => e - latest.data[i]),
+    });
   }
 
   public async getStatus(startDate: Date, endDate: Date) {
@@ -98,6 +110,21 @@ export class StatisticsService {
         createdAt: statistics[0]?.createdAt || new Date(),
         working: false,
       },
+    );
+  }
+
+  public async getLine3(startDate: Date, endDate: Date) {
+    const stats = await this.statisticsRepository.find({
+      where: { createdAt: Between(startDate, endDate) },
+      order: { createdAt: 'ASC' },
+    });
+
+    return stats.reduce(
+      (acc, val) => ({
+        covered: acc.covered + val.data[10],
+        checked: acc.checked + val.data[0],
+      }),
+      { covered: 0, checked: 0 },
     );
   }
 

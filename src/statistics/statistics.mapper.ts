@@ -10,7 +10,7 @@ export class StatisticsMapper {
       working: stat.working,
       createdAt: stat.createdAt,
       start: stat.data[3],
-      covered: stat.data[11] + stat.data[12] + stat.data[13],
+      covered: stat.data[10] + stat.data[11] + stat.data[12],
       checked: stat.data[0] + stat.data[1] + stat.data[2],
       ready: stat.data[6] + stat.data[7] + stat.data[8] + stat.data[9],
     };

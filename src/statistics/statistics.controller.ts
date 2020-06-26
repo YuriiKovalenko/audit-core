@@ -52,6 +52,15 @@ export class StatisticsController {
     return status.summed;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('line3')
+  public async getLine3(
+    @Query('startDate', ParseDatePipe) startDate: Date,
+    @Query('endDate', ParseDatePipe) endDate: Date,
+  ) {
+    return this.statisticsService.getLine3(startDate, endDate);
+  }
+
   @Post()
   public createStatistics(@Body() statisticsInput: StatisticsInput) {
     console.log(JSON.stringify(statisticsInput));
