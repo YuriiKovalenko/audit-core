@@ -6,11 +6,12 @@ import { StatisticsController } from './statistics.controller';
 import { StatisticsService } from './statistics.service';
 import { StatisticsMapper } from './statistics.mapper';
 import { RawLatest } from './raw-latest';
+import { SheetService } from './sheet.service';
 
 @Module({
   controllers: [StatisticsController],
   imports: [TypeOrmModule.forFeature([RawStatistics, RawLatest])],
-  providers: [StatisticsService, StatisticsMapper],
+  providers: [StatisticsService, StatisticsMapper, SheetService],
   exports: [StatisticsService],
 })
 export class StatisticsModule {}

@@ -15,3 +15,15 @@ export const dateTruncate = (
     .startOf(interval)
     .toDate();
 };
+
+export const dateToLocaleString = (date: Date) => {
+  return moment(date)
+    .locale('uk')
+    .format('DD.MM.YYYY HH:mm:ss');
+};
+
+export const dateToLocaleDateString = (date: Date) => {
+  return moment(date)
+    .locale('uk')
+    .format('DD.MM.YYYY');
+};

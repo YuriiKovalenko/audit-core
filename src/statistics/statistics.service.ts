@@ -9,6 +9,7 @@ import { dateTruncate, groupBy } from '../utils';
 import { StatisticsMapper } from './statistics.mapper';
 import { Statistics } from './statistics';
 import { RawLatest } from './raw-latest';
+import { SheetService } from './sheet.service';
 
 @Injectable()
 export class StatisticsService {
@@ -18,16 +19,37 @@ export class StatisticsService {
     @InjectRepository(RawLatest)
     private readonly rawLatestRepository: Repository<RawLatest>,
     private readonly mapper: StatisticsMapper,
+    private readonly sheetService: SheetService,
   ) {}
+
+  private getRawStatisticByTimeFrame(
+    startDate: Date = new Date(),
+    endDate: Date = new Date(),
+  ) {
+    return this.statisticsRepository.find({
+      where: { createdAt: Between(startDate, endDate) },
+      order: { createdAt: 'ASC' },
+    });
+  }
+
+  private groupByHour(
+    statistics: Statistics[] | RawStatistics[],
+  ): (Statistics[] | RawStatistics[])[] {
+    const truncatedStats = [];
+    for (const stat of statistics) {
+      truncatedStats.push({
+        ...stat,
+        createdAt: dateTruncate('hour', stat.createdAt),
+      });
+    }
+    return Object.values(groupBy(truncatedStats, 'createdAt'));
+  }
 
   public async getStatisticsByTimeframe(
     startDate: Date = new Date(),
     endDate: Date = new Date(),
   ) {
-    const stats = await this.statisticsRepository.find({
-      where: { createdAt: Between(startDate, endDate) },
-      order: { createdAt: 'ASC' },
-    });
+    const stats = await this.getRawStatisticByTimeFrame(startDate, endDate);
     return stats.map(stat => this.mapper.map(stat));
   }
 
@@ -35,14 +57,9 @@ export class StatisticsService {
     startDate: Date = new Date(),
     endDate: Date = new Date(),
   ) {
-    const stats = await this.getStatisticsByTimeframe(startDate, endDate).then(
-      stats =>
-        stats.map(stat => ({
-          ...stat,
-          createdAt: dateTruncate('hour', stat.createdAt),
-        })),
+    const groups = await this.getStatisticsByTimeframe(startDate, endDate).then(
+      stats => this.groupByHour(stats) as Statistics[][],
     );
-    const groups: Statistics[][] = Object.values(groupBy(stats, 'createdAt'));
     return groups.map(group => this.getSummedStatistics(group));
   }
 
@@ -113,19 +130,32 @@ export class StatisticsService {
     );
   }
 
-  public async getLine3(startDate: Date, endDate: Date) {
-    const stats = await this.statisticsRepository.find({
-      where: { createdAt: Between(startDate, endDate) },
-      order: { createdAt: 'ASC' },
-    });
-
-    return stats.reduce(
+  private getSummedRaw(statistics: RawStatistics[]) {
+    return statistics.reduce(
       (acc, val) => ({
-        covered: acc.covered + val.data[10],
-        checked: acc.checked + val.data[0],
+        data: acc.data.map((e, i) => e + val.data[i]),
+        createdAt: acc.createdAt,
+        working: acc.working || val.working,
       }),
-      { covered: 0, checked: 0 },
+      {
+        data: new Array(15).fill(0),
+        createdAt: statistics[0]?.createdAt || new Date(),
+        working: false,
+      },
     );
+  }
+
+  public async getLines(startDate: Date, endDate: Date) {
+    const stats = await this.getRawStatisticByTimeFrame(startDate, endDate);
+    const summed = this.getSummedRaw(stats);
+    return {
+      lines: [
+        summed.data[10],
+        summed.data[12],
+        summed.data[11],
+        summed.data[5],
+      ],
+    };
   }
 
   private mapInput(statisticsInput: StatisticsInput) {
@@ -134,5 +164,12 @@ export class StatisticsService {
       createdAt: statisticsInput.date,
       working: statisticsInput.working,
     });
+  }
+
+  public async getReport(startDate: Date, endDate: Date) {
+    const stats = await this.getRawStatisticByTimeFrame(startDate, endDate);
+    const groups = this.groupByHour(stats) as RawStatistics[][];
+    const summed = groups.map(group => this.getSummedRaw(group));
+    return this.sheetService.createTable(summed, startDate, endDate);
   }
 }
