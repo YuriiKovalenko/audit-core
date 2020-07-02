@@ -7,6 +7,7 @@ import {
   Body,
   Res,
   Header,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ParseDatePipe } from '../shared/pipes/parse-date.pipe';
 import { StatisticsService } from './statistics.service';
@@ -29,12 +30,19 @@ export class StatisticsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('hourly')
-  public getStatisticsHourly(
+  @Get('interval')
+  public getStatisticsByInterval(
     @Query('startDate', ParseDatePipe) startDate: Date,
     @Query('endDate', ParseDatePipe) endDate: Date,
+    @Query('key') key: string,
+    @Query('interval', ParseIntPipe) interval: number,
   ) {
-    return this.statisticsService.getStatisticsHourly(startDate, endDate);
+    return this.statisticsService.getStatisticsByInterval(
+      startDate,
+      endDate,
+      interval,
+      key,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -79,11 +87,15 @@ export class StatisticsController {
   public async getReport(
     @Query('startDate', ParseDatePipe) startDate: Date,
     @Query('endDate', ParseDatePipe) endDate: Date,
+    @Query('key') key: string,
+    @Query('interval', ParseIntPipe) interval: number,
     @Res() res: ServerResponse,
   ) {
     const fileStream = await this.statisticsService.getReport(
       startDate,
       endDate,
+      interval,
+      key,
     );
     res.setHeader(
       'Content-Disposition',

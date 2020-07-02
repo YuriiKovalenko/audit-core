@@ -1,4 +1,6 @@
 import * as moment from 'moment';
+import 'moment-round';
+console.log(moment().floor(1, 'hour'))
 
 export const groupBy = (xs: any[], key: string) => {
   return xs.reduce(function(rv, x) {
@@ -7,12 +9,13 @@ export const groupBy = (xs: any[], key: string) => {
   }, {});
 };
 
-export const dateTruncate = (
-  interval: moment.unitOfTime.StartOf,
+export const roundDate = (
+  precision: number,
+  key: string,
   date: Date,
 ) => {
   return moment(date)
-    .startOf(interval)
+    .floor(precision, key)
     .toDate();
 };
 

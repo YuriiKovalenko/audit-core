@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { RawStatistics } from './raw-statistics';
 import { StatisticsInput } from './statistics.input';
-import { dateTruncate, groupBy } from '../utils';
+import { roundDate, groupBy } from '../utils';
 import { StatisticsMapper } from './statistics.mapper';
 import { Statistics } from './statistics';
 import { RawLatest } from './raw-latest';
@@ -32,14 +32,16 @@ export class StatisticsService {
     });
   }
 
-  private groupByHour(
+  private groupByPrecisionInterval(
     statistics: Statistics[] | RawStatistics[],
+    interval: number,
+    key: string
   ): (Statistics[] | RawStatistics[])[] {
     const truncatedStats = [];
     for (const stat of statistics) {
       truncatedStats.push({
         ...stat,
-        createdAt: dateTruncate('hour', stat.createdAt),
+        createdAt: roundDate(interval, key, stat.createdAt),
       });
     }
     return Object.values(groupBy(truncatedStats, 'createdAt'));
@@ -53,12 +55,14 @@ export class StatisticsService {
     return stats.map(stat => this.mapper.map(stat));
   }
 
-  public async getStatisticsHourly(
+  public async getStatisticsByInterval(
     startDate: Date = new Date(),
     endDate: Date = new Date(),
+    interval = 60,
+    key = 'minute'
   ) {
     const groups = await this.getStatisticsByTimeframe(startDate, endDate).then(
-      stats => this.groupByHour(stats) as Statistics[][],
+      stats => this.groupByPrecisionInterval(stats, interval, key) as Statistics[][],
     );
     return groups.map(group => this.getSummedStatistics(group));
   }
@@ -166,9 +170,9 @@ export class StatisticsService {
     });
   }
 
-  public async getReport(startDate: Date, endDate: Date) {
+  public async getReport(startDate: Date, endDate: Date, interval: number, key: string) {
     const stats = await this.getRawStatisticByTimeFrame(startDate, endDate);
-    const groups = this.groupByHour(stats) as RawStatistics[][];
+    const groups = this.groupByPrecisionInterval(stats, interval, key) as RawStatistics[][];
     const summed = groups.map(group => this.getSummedRaw(group));
     return this.sheetService.createTable(summed, startDate, endDate);
   }

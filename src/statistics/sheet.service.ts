@@ -17,30 +17,34 @@ export class SheetService {
       properties: { defaultColWidth: 13 },
     });
     ws.getColumn('A').width = 18;
-    ws.mergeCells('A1:Q1');
-    ws.getCell(
-      'A1',
-    ).value = `Облік продукції. Черкаський консервний завод. Цех №1, Період ${dateToLocaleString(
+    ws.mergeCells('A1:D1');
+    ws.mergeCells('E1:H1');
+    ws.getCell('A1').value =
+      'Облік продукції. Черкаський консервний завод. Цех №1.';
+    ws.getCell('E1').value = `Період ${dateToLocaleString(
       startDate,
     )} - ${dateToLocaleString(endDate)}`;
-
+    ws.addRow(
+      ['Датчики', 8, 9, 15, 17, 16, 10, 5, 7, 6, 10, 11, 12, 13, 14],
+      'i',
+    );
     const header = ws.addRow(
       [
         'Час',
-        'Спочатку всього',
         'Деполітайзер',
         'Ручна подача',
-        'Закатка всього',
-        'Закатка 1 машина',
-        'Закатка 2 машина',
-        'Закатка 3 машина',
-        'Закатка 4 машина',
-        'Перевірено всього',
-        'Готово всього',
-        'Готово 1 вихід',
-        'Готово 2 вихід',
-        'Готово 3 вихід',
-        'Готово 4 вихід',
+        'Закатка 1',
+        'Закатка 2',
+        'Закатка 3',
+        'Закатка 4',
+        'Інспектовано 1',
+        'Інспектовано 2',
+        'Інспектовано 3',
+        'Інспектовано 4',
+        'Готово 1',
+        'Готово 2',
+        'Готово 3',
+        'Готово 4',
       ],
       'i',
     );
@@ -50,16 +54,16 @@ export class SheetService {
       ws.addRow(
         [
           dateToLocaleString(stat.createdAt),
-          data[3] + data[4],
           data[3],
           data[4],
-          data[5] + data[10] + data[11] + data[12],
           data[10],
           data[12],
           data[11],
           data[5],
-          data[0] + data[1] + data[2] + data[5],
-          data[6] + data[7] + data[8] + data[9],
+          data[0],
+          data[2],
+          data[1],
+          data[5],
           data[6],
           data[7],
           data[8],
