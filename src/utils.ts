@@ -1,6 +1,6 @@
 import * as moment from 'moment';
+import * as momentTz from 'moment-timezone';
 import 'moment-round';
-console.log(moment().floor(1, 'hour'))
 
 export const groupBy = (xs: any[], key: string) => {
   return xs.reduce(function(rv, x) {
@@ -20,13 +20,13 @@ export const roundDate = (
 };
 
 export const dateToLocaleString = (date: Date) => {
-  return moment(date)
-    .locale('uk')
+  return momentTz(date)
+    .tz('Europe/Kiev')
     .format('DD.MM.YYYY HH:mm:ss');
 };
 
 export const dateToLocaleDateString = (date: Date) => {
-  return moment(date)
-    .locale('uk')
+  return momentTz(date)
+    .tz('Europe/Kiev')
     .format('DD.MM.YYYY');
 };
