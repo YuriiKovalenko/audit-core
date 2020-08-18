@@ -68,7 +68,11 @@ export class SheetService {
       data[9],
     ]);
     ws.addRows(rows);
+    console.log(process.cpuUsage());
+    console.log(process.memoryUsage());
     wb.xlsx.write(output);
+    console.log(process.cpuUsage());
+    console.log(process.memoryUsage());
     return output;
   }
 }
