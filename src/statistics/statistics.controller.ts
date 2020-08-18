@@ -91,7 +91,7 @@ export class StatisticsController {
     @Query('interval', ParseIntPipe) interval: number,
     @Res() res: ServerResponse,
   ) {
-    const fileStream = await this.statisticsService.getReport(
+    const report = await this.statisticsService.getReport(
       startDate,
       endDate,
       interval,
@@ -104,6 +104,7 @@ export class StatisticsController {
       )}-${dateToLocaleDateString(endDate)}.xlsx"`,
     );
 
-    fileStream.pipe(res);
+    res.write(report);
+    res.end();
   }
 }

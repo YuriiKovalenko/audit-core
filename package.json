@@ -41,7 +41,9 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.6.2",
-    "typeorm": "^0.2.25"
+    "typeorm": "^0.2.25",
+    "xlsx": "^0.16.6",
+    "xlsx-workbook": "^1.0.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.4.1",

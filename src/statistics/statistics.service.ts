@@ -174,6 +174,6 @@ export class StatisticsService {
     const stats = await this.getRawStatisticByTimeFrame(startDate, endDate);
     const groups = this.groupByPrecisionInterval(stats, interval, key) as RawStatistics[][];
     const summed = groups.map(group => this.getSummedRaw(group));
-    return this.sheetService.createTable(summed, startDate, endDate);
+    return this.sheetService.create(summed, startDate, endDate);
   }
 }
