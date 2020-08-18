@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { stream } from 'exceljs';
+import { Workbook } from 'exceljs';
 import { RawStatistics } from './raw-statistics';
 import { PassThrough } from 'stream';
 import { dateToLocaleString } from '../utils';
@@ -12,7 +12,7 @@ export class SheetService {
     endDate: Date,
   ) {
     const output = new PassThrough();
-    const wb = new stream.xlsx.WorkbookWriter({ stream: output });
+    const wb = new Workbook();
     const ws = wb.addWorksheet('Облік продукції', {
       properties: { defaultColWidth: 13 },
     });
@@ -49,31 +49,26 @@ export class SheetService {
       'i',
     );
     header.height = 45;
-    statistics.forEach(stat => {
-      const { data } = stat;
-      ws.addRow(
-        [
-          dateToLocaleString(stat.createdAt),
-          data[3],
-          data[4],
-          data[10],
-          data[12],
-          data[11],
-          data[5],
-          data[0],
-          data[2],
-          data[1],
-          data[5],
-          data[6],
-          data[7],
-          data[8],
-          data[9],
-        ],
-        'n',
-      );
-    });
-    ws.commit();
-    await wb.commit();
+
+    const rows = statistics.map(({ data, createdAt }) => [
+      dateToLocaleString(createdAt),
+      data[3],
+      data[4],
+      data[10],
+      data[12],
+      data[11],
+      data[5],
+      data[0],
+      data[2],
+      data[1],
+      data[5],
+      data[6],
+      data[7],
+      data[8],
+      data[9],
+    ]);
+    ws.addRows(rows);
+    wb.xlsx.write(output);
     return output;
   }
 }
