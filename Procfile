@@ -1,1 +1,1 @@
-web: npm run start:prod -- --max-old-space-size=512
+web: npm run start:prod -- --max-old-space-size=240
